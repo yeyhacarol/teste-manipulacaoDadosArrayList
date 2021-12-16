@@ -11,10 +11,12 @@ public class Arquivo {
 	private String texto;
 	private String caminho;
 
+	public ContatoRepository objContatoRepo = new ContatoRepository();
+
 	// criação de um método para criação(quando não existir o arquivo) e gravação de
 	// dados no mesmo
 
-	public boolean gravar(String caminho, String texto) {
+	public boolean escrever(String caminho, String texto) {
 
 		// estrutura utilizada para fazer tratamento na ocorrência de erros
 		try {
@@ -28,7 +30,7 @@ public class Arquivo {
 
 			PrintWriter escreverArq = new PrintWriter(arquivo);
 
-			// append permite a escritura no nosso aquivo
+			// append permite a escritura, no final, no nosso aquivo
 			escreverArq.append(texto);
 
 			escreverArq.close();
@@ -45,10 +47,7 @@ public class Arquivo {
 
 	}
 
-	public String ler(String caminho) {
-
-		// variável acumuladora para o while
-		String conteudo = "";
+	public ContatoRepository ler(String caminho) {
 
 		try {
 
@@ -67,23 +66,33 @@ public class Arquivo {
 			// com o while o arquivo será lido linha por linha até que não hajam mais linhas
 
 			while (linha != null) {
-
-				conteudo += linha + "\n";
+				
+				//solução para que os textos não sejam sobrescritos e sim se adicionem
+				
+				//o split é utilizado para fazer a separação entre os textos através do caractere ";"
+				String[] dadosLinha = linha.split(";");
+				
+				Contato objContato = new Contato();
+				objContato.setNome(dadosLinha[0]);
+				objContato.setEmail(dadosLinha[1]);
+				objContato.setTelefone(dadosLinha[2]);
+				objContato.setCidade(dadosLinha[3]);
+				
+				objContatoRepo.cadastrarContato(objContato);
 
 				linha = lerArq.readLine();
-
 			}
 
 			arquivo.close();
 
 			// retorna o conteúdo carregado com as linhas
-			return conteudo;
+			return objContatoRepo;
 
 		} catch (IOException e) {
 
 			System.out.println("ERRO: " + e.getMessage());
 
-			return "";
+			return objContatoRepo;
 		}
 
 	}
